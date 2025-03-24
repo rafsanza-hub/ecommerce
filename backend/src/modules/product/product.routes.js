@@ -6,17 +6,18 @@ const {
     updateProduct,
     deleteProduct,
   } = require('./product.controller');
+const verifyToken = require('../../middleware/auth');
 
 // (POST /api/products)
-router.post('/', createProduct);
+router.post('/', verifyToken, createProduct);
 
 // (GET /api/products)
-router.get('/', getProducts);
+router.get('/', verifyToken, getProducts);
 
 // (PUT /api/products/:id)
-router.put('/:id', updateProduct);
+router.put('/:id', verifyToken, updateProduct);
 
 // (DELETE /api/products/:id)
-router.delete('/:id', deleteProduct);
+router.delete('/:id', verifyToken, deleteProduct);
 
 module.exports = router;
