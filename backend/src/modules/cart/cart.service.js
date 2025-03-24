@@ -45,7 +45,7 @@ class CartService {
         cart.items[itemIndex].quantity += quantity;
       } else {
         // Tambahkan item baru ke keranjang
-        cart.items.push({ product: productId, quantity });
+        cart.items.push({ product: productId, quantity, price: product.price });
       }
   
       // Hitung ulang total menggunakan loop biasa

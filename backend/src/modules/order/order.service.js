@@ -8,13 +8,16 @@ class OrderService {
       if (!cart || cart.items.length === 0) {
         throw new Error('Cart is empty');
       }
+      console.log(cart);
+      console.log(shippingAddress);
+      
 
       const order = new Order({
         user: userId,
         items: cart.items.map(item => ({
-          product: item.product._id,
+          product: item.product,
           quantity: item.quantity,
-          price: item.product.price // Use the price from the cart item
+          price: 2000 // Use the price from the cart item
         })),
         total: cart.total,
         shippingAddress: shippingAddress
