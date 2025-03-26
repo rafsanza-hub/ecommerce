@@ -34,6 +34,10 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.17
   form_field_validator: ^1.1.0
+  http: ^1.2.1 # For making HTTP requests
+  flutter_bloc: ^8.1.6 # For state management
+  equatable: ^2.0.5 # For value equality in Bloc states/events
+  shared_preferences: ^2.2.3 # For storing JWT token locally
 
 dev_dependencies:
   flutter_lints: ^5.0.0
