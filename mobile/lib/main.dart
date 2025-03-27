@@ -47,10 +47,10 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           // If authenticated, show HomeScreen
-          return const HomeScreen(); 
+          return HomeScreen(); 
         } else if (state is AuthUnauthenticated || state is AuthFailure) {
           // If unauthenticated or login failed, show LoginScreen
-          return const LoginScreen();
+          return LoginScreen();
         } else {
           // If AuthInitial or AuthLoading, show a loading indicator
           return const Scaffold(

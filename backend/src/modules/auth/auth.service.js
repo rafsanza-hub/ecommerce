@@ -23,9 +23,11 @@ class AuthService {
     }
   }
 
-  async login(username, password) {
+  async login(usernameOrEmail, password) {
     try {
-      const auth = await Auth.findOne({ username });
+      const auth = await Auth.findOne({
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+      });
 
       if (!auth) {
         throw new Error('User not found!');

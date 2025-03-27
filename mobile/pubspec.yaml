@@ -38,6 +38,7 @@ dependencies:
   flutter_bloc: ^8.1.6 # For state management
   equatable: ^2.0.5 # For value equality in Bloc states/events
   shared_preferences: ^2.2.3 # For storing JWT token locally
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_lints: ^5.0.0

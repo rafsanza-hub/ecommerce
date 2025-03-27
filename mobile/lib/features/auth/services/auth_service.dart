@@ -5,8 +5,9 @@ import '../models/auth_model.dart';
 
 class AuthService {
   // Adjust the base URL if your backend runs on a different port or path
-  final String _baseUrl = 'http://localhost:5000/api/auth'; // Assuming '/api/auth' prefix for auth routes
-  static const String _tokenKey = 'jwt_token';
+  final String _baseUrl =
+      'http://10.0.2.2:5000/api/auth'; // Assuming '/api/auth' prefix for auth routes
+  static const String _tokenKey = '';
 
   // --- Token Management ---
 
@@ -32,38 +33,45 @@ class AuthService {
 
   // --- API Calls ---
 
-  Future<AuthModel> login(String email, String password) async {
+  Future<AuthModel> login(String usernameOrEmail, String password) async {
     final url = Uri.parse('$_baseUrl/login'); // Adjust endpoint if needed
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode(
+            {'usernameOrEmail': usernameOrEmail, 'password': password}),
       );
 
+      print(response.body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
+
         // Assuming the backend returns user data and token nested under a key like 'data' or directly
         // Adjust 'token' and user data keys based on your actual backend response structure
-        final Map<String, dynamic> userData = responseData['user'] ?? responseData; // Example: check for 'user' key first
-        final String token = responseData['token'] ?? ''; 
+        final Map<String, dynamic> userData = responseData['user'] ??
+            responseData; // Example: check for 'user' key first
+        final String token = responseData['token'] ?? '';
 
         if (token.isEmpty) {
-           throw Exception('Login successful, but no token received.');
+          throw Exception('Login successful, but no token received.');
         }
-        
+
         final authData = AuthModel.fromJson({...userData, 'token': token});
+
+        // print(responseData);
         await _saveToken(authData.token);
         return authData;
-
       } else {
         // Attempt to parse error message from backend
         String errorMessage = 'Login failed';
         try {
           final errorData = jsonDecode(response.body);
-          errorMessage = errorData['message'] ?? 'Login failed with status code: ${response.statusCode}';
+          errorMessage = errorData['message'] ??
+              'Login failed with status code: ${response.statusCode}';
         } catch (_) {
-          errorMessage = 'Login failed with status code: ${response.statusCode}';
+          errorMessage =
+              'Login failed with status code: ${response.statusCode}';
         }
         throw Exception(errorMessage);
       }
@@ -75,30 +83,27 @@ class AuthService {
   }
 
   // Example Registration method - Adapt to your backend endpoint and payload
-  Future<AuthModel> register({
-      required String name, 
-      required String email, 
-      required String password
-  }) async {
+  Future<AuthModel> register(
+      {required String name,
+      required String email,
+      required String password}) async {
     final url = Uri.parse('$_baseUrl/register'); // Adjust endpoint if needed
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name, 
-          'email': email, 
-          'password': password
-        }),
+        body: jsonEncode({'name': name, 'email': email, 'password': password}),
       );
 
-       if (response.statusCode == 201 || response.statusCode == 200) { // Handle 201 Created or 200 OK
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        // Handle 201 Created or 200 OK
         final responseData = jsonDecode(response.body);
-        final Map<String, dynamic> userData = responseData['user'] ?? responseData;
+        final Map<String, dynamic> userData =
+            responseData['user'] ?? responseData;
         final String token = responseData['token'] ?? '';
 
         if (token.isEmpty) {
-           throw Exception('Registration successful, but no token received.');
+          throw Exception('Registration successful, but no token received.');
         }
 
         final authData = AuthModel.fromJson({...userData, 'token': token});
@@ -108,15 +113,18 @@ class AuthService {
         String errorMessage = 'Registration failed';
         try {
           final errorData = jsonDecode(response.body);
-          errorMessage = errorData['message'] ?? 'Registration failed with status code: ${response.statusCode}';
+          errorMessage = errorData['message'] ??
+              'Registration failed with status code: ${response.statusCode}';
         } catch (_) {
-           errorMessage = 'Registration failed with status code: ${response.statusCode}';
+          errorMessage =
+              'Registration failed with status code: ${response.statusCode}';
         }
         throw Exception(errorMessage);
       }
     } catch (e) {
       print('Registration Error: $e');
-      throw Exception('An error occurred during registration. Please try again.');
+      throw Exception(
+          'An error occurred during registration. Please try again.');
     }
   }
 
@@ -132,5 +140,54 @@ class AuthService {
     // } catch (e) {
     //   print('Logout API call failed: $e');
     // }
+  }
+  
+  Future<Map<String, dynamic>> getUserData() async {
+  final url = Uri.parse('http://10.0.2.2:5000/api/auth/users');
+  final token = await getToken();  // Ambil token dari SharedPreferences
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $token'},
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);  // Return data user
+  } else {
+    throw Exception('Failed to load user data');
+  }
+}
+
+
+
+  // --- Helper method for authenticated requests ---
+  Future<http.Response> authenticatedRequest(String url,
+      {String method = 'GET',
+      Map<String, String>? headers,
+      dynamic body}) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('No token available. User is not logged in.');
+    }
+
+    final allHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      ...?headers, // Merge additional headers if provided
+    };
+
+    final uri = Uri.parse(url);
+
+    switch (method.toUpperCase()) {
+      case 'GET':
+        return http.get(uri, headers: allHeaders);
+      case 'POST':
+        return http.post(uri, headers: allHeaders, body: body);
+      case 'PUT':
+        return http.put(uri, headers: allHeaders, body: body);
+      case 'DELETE':
+        return http.delete(uri, headers: allHeaders);
+      default:
+        throw Exception('Unsupported HTTP method: $method');
+    }
   }
 }
