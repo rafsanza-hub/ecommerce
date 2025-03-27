@@ -1,22 +1,45 @@
 const CategoryService = require('./category.service');
+const ApiResponse = require('../../utils/response');
 
 class CategoryController {
   async createCategory(req, res) {
     try {
       const { name, description } = req.body;
-      const category = await CategoryService.createCategory(name, description);
-      res.status(201).json(category);
+      if (!name) {
+        return ApiResponse.error(res, 'Missing required fields', [
+          { code: 'MISSING_FIELDS', detail: 'Category name is required' }
+        ], 400);
+      }
+      const category = await CategoryService.createCategory({ name, description });
+      const responseData = {
+        id: category._id,
+        name: category.name,
+        description: category.description,
+        slug: category.slug,
+        createdAt: category.createdAt
+      };
+      return ApiResponse.success(res, responseData, 'Category created successfully', null, 201);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      const statusCode = error.message.includes('exists') ? 409 : 500;
+      const errorCode = error.message.includes('exists') ? 'DUPLICATE_ENTRY' : 'INTERNAL_SERVER_ERROR';
+      return ApiResponse.error(res, error.message, [{ code: errorCode, detail: error.message }], statusCode);
     }
   }
 
   async getCategories(req, res) {
     try {
       const categories = await CategoryService.getCategories();
-      res.status(200).json(categories);
+      const responseData = categories.map(category => ({
+        id: category._id,
+        name: category.name,
+        description: category.description,
+        slug: category.slug,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt
+      }));
+      return ApiResponse.success(res, responseData, 'Categories retrieved successfully');
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      return ApiResponse.error(res, error.message, [{ code: 'INTERNAL_SERVER_ERROR', detail: error.message }], 500);
     }
   }
 }
