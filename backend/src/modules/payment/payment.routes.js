@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const paymentController = require('./payment.controller');
+const PaymentController = require('./payment.controller');
 const verifyToken = require('../../middleware/auth');
 
-router.post('/', verifyToken, paymentController.createPayment);
-router.post('/callback', paymentController.handlePaymentCallback);
-router.get('/:orderId', verifyToken, paymentController.getPayment);
+router.post('/', verifyToken, PaymentController.createPayment);
+router.post('/callback', PaymentController.handlePaymentCallback); // Publik untuk Midtrans
+router.get('/:orderId', verifyToken, PaymentController.getPayment);
 
 module.exports = router;

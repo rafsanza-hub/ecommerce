@@ -14,6 +14,7 @@ app.use('/api/products', require('./modules/product/product.routes'));
 app.use('/api/categories', require('./modules/category/category.routes'));
 app.use('/api/cart', require('./modules/cart/cart.routes'));
 app.use('/api/orders', require('./modules/order/order.routes'));
+app.use('/api/payments', require('./modules/payment/payment.routes'));
 
 
 // Jalankan server
