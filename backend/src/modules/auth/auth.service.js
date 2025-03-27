@@ -1,53 +1,27 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const Auth = require('./auth.model');
-const UserService = require('../user/user.service');
+const User = require('../user/user.model');
 
 class AuthService {
-  async register(username, password, email) {
-    try {
-      const auth = new Auth({ username, password, email });
-      await auth.save();
+  async register(username, password, email, fullName) {
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) throw new Error('Username or email already registered');
 
-      // Membuat user di module user
-      await UserService.createUser(username, email);
+    const user = new User({ username, password, email, fullName });
+    await user.save();
 
-      // Generate JWT
-      const token = jwt.sign({ id: auth._id }, process.env.JWT_SECRET, {
-        expiresIn: '24h' // Masa berlaku 24 jam
-      });
-
-      return { message: 'User created!', token: token };
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    return { user: { id: user._id, username, email, fullName }, token };
   }
 
   async login(usernameOrEmail, password) {
-    try {
-      const auth = await Auth.findOne({
-        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-      });
+    const user = await User.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+    }).select('+password');
+    if (!user) throw new Error('User not found');
+    if (!(await user.comparePassword(password))) throw new Error('Invalid password');
 
-      if (!auth) {
-        throw new Error('User not found!');
-      }
-
-      const isPasswordValid = await auth.comparePassword(password);
-
-      if (!isPasswordValid) {
-        throw new Error('Invalid password!');
-      }
-
-      // Generate JWT
-      const token = jwt.sign({ id: auth._id }, process.env.JWT_SECRET, {
-        expiresIn: '24h' // Masa berlaku 24 jam
-      });
-
-      return { message: 'Login successful!', token: token };
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    return { user: { id: user._id, username: user.username, email: user.email }, token };
   }
 }
 
