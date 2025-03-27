@@ -3,89 +3,55 @@ const Product = require('../product/product.model');
 
 class CartService {
   async createCart(userId) {
-    const cart = await Cart.findOne({ user: userId });
-    if (cart) {
-      return cart;
-    }
-    try {
-      const cart = new Cart({ user: userId, items: [], total: 0 });
-      await cart.save();
-      return cart;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const existingCart = await Cart.findOne({ user: userId });
+    if (existingCart) throw new Error('Cart already exists for this user');
+    const cart = new Cart({ user: userId, items: [], total: 0 });
+    return await cart.save();
   }
 
   async getCart(userId) {
-    try {
-      const cart = await Cart.findOne({ user: userId }).populate('items.product');
-      return cart;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const cart = await Cart.findOne({ user: userId, isActive: true })
+      .populate('items.product', 'name price imageUrl')
+      .populate('user', 'username email');
+    if (!cart) throw new Error('Cart not found');
+    return cart;
   }
 
   async addItem(userId, productId, quantity) {
-    try {
-      const cart = await Cart.findOne({ user: userId });
-      if (!cart) {
-        throw new Error('Cart not found');
-      }
-  
-      // Cari produk dari database
-      const product = await Product.findById(productId);
-      if (!product) {
-        throw new Error('Product not found');
-      }
-  
-      const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-  
-      if (itemIndex > -1) {
-        // Jika item sudah ada di keranjang, tambahkan jumlah
-        cart.items[itemIndex].quantity += quantity;
-      } else {
-        // Tambahkan item baru ke keranjang
-        cart.items.push({ product: productId, quantity, price: product.price });
-      }
-  
-      // Hitung ulang total menggunakan loop biasa
-      let total = 0;
-      for (let item of cart.items) {
-        const itemProduct = await Product.findById(item.product); // Ambil produk dari database
-        total += itemProduct.price * item.quantity; // Hitung total berdasarkan harga dan jumlah item
-      }
-  
-      cart.total = total; // Set total ke keranjang
-      await cart.save(); // Simpan perubahan ke database
-      return cart;
-    } catch (error) {
-      throw new Error(error.message);
+    let cart = await Cart.findOne({ user: userId, isActive: true });
+    if (!cart) {
+      cart = new Cart({ user: userId, items: [], total: 0 });
     }
+
+    const product = await Product.findById(productId);
+    if (!product || !product.isActive) throw new Error('Product not found or inactive');
+    if (product.stock < quantity) throw new Error('Insufficient stock');
+
+    const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+    if (itemIndex > -1) {
+      cart.items[itemIndex].quantity += quantity;
+    } else {
+      cart.items.push({ product: productId, quantity, price: product.price });
+    }
+
+    cart.total = cart.items.reduce((acc, item) => {
+      return acc + item.price * item.quantity;
+    }, 0);
+
+    return await cart.save();
   }
-  
-  
 
   async removeItem(userId, productId) {
-    try {
-      const cart = await Cart.findOne({ user: userId });
-      if (!cart) {
-        throw new Error('Cart not found');
-      }
+    const cart = await Cart.findOne({ user: userId, isActive: true });
+    if (!cart) throw new Error('Cart not found');
 
-      const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+    const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+    if (itemIndex === -1) throw new Error('Item not found in cart');
 
-      if (itemIndex > -1) {
-        cart.items.splice(itemIndex, 1);
-      }
+    cart.items.splice(itemIndex, 1);
+    cart.total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-      // Recalculate total
-      cart.total = cart.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-
-      await cart.save();
-      return cart;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    return await cart.save();
   }
 }
 
