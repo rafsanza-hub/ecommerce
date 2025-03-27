@@ -3,55 +3,43 @@ const CartService = require('../cart/cart.service');
 
 class OrderService {
   async createOrder(userId, shippingAddress) {
-    try {
-      const cart = await CartService.getCart(userId);
-      if (!cart || cart.items.length === 0) {
-        throw new Error('Cart is empty');
-      }
-      console.log(cart);
-      console.log(shippingAddress);
-      
+    const cart = await CartService.getCart(userId);
+    if (!cart || cart.items.length === 0) throw new Error('Cart is empty');
 
-      const order = new Order({
-        user: userId,
-        items: cart.items.map(item => ({
-          product: item.product,
-          quantity: item.quantity,
-          price: 2000 // Use the price from the cart item
-        })),
-        total: cart.total,
-        shippingAddress: shippingAddress
-      });
+    const order = new Order({
+      user: userId,
+      items: cart.items.map(item => ({
+        product: item.product._id, // Pastikan ID produk dari populate
+        quantity: item.quantity,
+        price: item.price
+      })),
+      total: cart.total,
+      shippingAddress
+    });
 
-      await order.save();
+    const savedOrder = await order.save();
 
-      // Clear the cart after creating the order
-      cart.items = [];
-      cart.total = 0;
-      await cart.save();
+    // Kosongkan cart setelah order dibuat
+    cart.items = [];
+    cart.total = 0;
+    await cart.save();
 
-      return order;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    return savedOrder;
   }
 
   async getOrders(userId) {
-    try {
-      const orders = await Order.find({ user: userId }).populate('items.product');
-      return orders;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    return await Order.find({ user: userId, isActive: true })
+      .populate('items.product', 'name price imageUrl')
+      .populate('user', 'username email')
+      .sort({ orderDate: -1 }); // Urutkan dari terbaru
   }
 
-  async getOrder(orderId) {
-    try {
-      const order = await Order.findById(orderId).populate('items.product');
-      return order;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+  async getOrder(orderId, userId) {
+    const order = await Order.findOne({ _id: orderId, user: userId, isActive: true })
+      .populate('items.product', 'name price imageUrl')
+      .populate('user', 'username email');
+    if (!order) throw new Error('Order not found');
+    return order;
   }
 }
 

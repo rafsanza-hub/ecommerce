@@ -13,6 +13,7 @@ app.use('/api/users', require('./modules/user/user.routes'));
 app.use('/api/products', require('./modules/product/product.routes'));
 app.use('/api/categories', require('./modules/category/category.routes'));
 app.use('/api/cart', require('./modules/cart/cart.routes'));
+app.use('/api/orders', require('./modules/order/order.routes'));
 
 
 // Jalankan server
