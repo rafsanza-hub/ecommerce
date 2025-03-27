@@ -1,29 +1,39 @@
 const Product = require('./product.model');
 
-// Tambah produk baru
-const addProduct = async (productData) => {
-  const product = new Product(productData);
-  return await product.save();
-};
+class ProductService {
+  async createProduct(productData) {
+    const product = new Product(productData);
+    return await product.save();
+  }
 
-// Ambil semua produk
-const getAllProducts = async () => {
-  return await Product.find();
-};
+  async getAllProducts() {
+    return await Product.find({ isActive: true }).populate('category', 'name');
+  }
 
-// Update produk berdasarkan ID
-const updateProductById = async (productId, updateData) => {
-  return await Product.findByIdAndUpdate(productId, updateData, { new: true });
-};
+  async getProductById(productId) {
+    const product = await Product.findById(productId).populate('category', 'name');
+    if (!product || !product.isActive) throw new Error('Product not found');
+    return product;
+  }
 
-// Hapus produk berdasarkan ID
-const deleteProductById = async (productId) => {
-  return await Product.findByIdAndDelete(productId);
-};
+  async updateProduct(productId, updateData) {
+    const product = await Product.findByIdAndUpdate(productId, updateData, {
+      new: true,
+      runValidators: true
+    });
+    if (!product || !product.isActive) throw new Error('Product not found');
+    return product;
+  }
 
-module.exports = {
-  addProduct,
-  getAllProducts,
-  updateProductById,
-  deleteProductById,
-};
+  async deleteProduct(productId) {
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { isActive: false },
+      { new: true }
+    );
+    if (!product || !product.isActive) throw new Error('Product not found');
+    return product;
+  }
+}
+
+module.exports = new ProductService();
