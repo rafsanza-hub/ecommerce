@@ -1,43 +1,29 @@
-part of 'auth_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-sealed class AuthEvent extends Equatable {
+abstract class AuthEvent extends Equatable {
   const AuthEvent();
-
   @override
   List<Object?> get props => [];
 }
 
-// Event untuk memicu pengecekan status autentikasi saat ini (misalnya, saat aplikasi dimulai)
-final class AuthCheckStatusRequested extends AuthEvent {}
+class AuthCheckStatus extends AuthEvent {}
 
-// Event yang dipicu ketika pengguna mencoba masuk
-final class AuthLoginRequested extends AuthEvent {
-  final String email;
+class AuthLogin extends AuthEvent {
+  final String usernameOrEmail;
   final String password;
-
-  const AuthLoginRequested({required this.email, required this.password});
-
+  const AuthLogin(this.usernameOrEmail, this.password);
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [usernameOrEmail, password];
 }
 
-// Event yang dipicu ketika pengguna mencoba mendaftar
-final class AuthRegisterRequested extends AuthEvent {
-  final String name;
+class AuthRegister extends AuthEvent {
+  final String username;
   final String email;
   final String password;
-
-  const AuthRegisterRequested({
-    required this.name,
-    required this.email,
-    required this.password,
-  });
-
+  final String? fullName;
+  const AuthRegister(this.username, this.email, this.password, this.fullName);
   @override
-  List<Object?> get props => [name, email, password];
+  List<Object?> get props => [username, email, password, fullName];
 }
 
-
-// Event yang dipicu ketika pengguna keluar
-final class AuthLogoutRequested extends AuthEvent {}
+class AuthLogout extends AuthEvent {}

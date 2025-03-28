@@ -1,39 +1,28 @@
 import 'package:equatable/equatable.dart';
 
 class AuthModel extends Equatable {
+  final String token;
   final String id;
-  final String name;
+  final String username;
   final String email;
-  final String token; // The JWT token
 
   const AuthModel({
-    required this.id,
-    required this.name,
-    required this.email,
     required this.token,
+    required this.id,
+    required this.username,
+    required this.email,
   });
 
-  // Factory constructor to create an AuthModel from JSON
   factory AuthModel.fromJson(Map<String, dynamic> json) {
+    final user = json['user'] as Map<String, dynamic>;
     return AuthModel(
-      // Adjust field names based on your actual backend response
-      id: json['_id'] ?? json['id'] ?? '', 
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      token: json['token'] ?? '', 
+      token: json['token'] as String,
+      id: user['id'] as String,
+      username: user['username'] as String,
+      email: user['email'] as String,
     );
   }
 
-  // Method to convert AuthModel to JSON (optional, might be useful)
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'token': token,
-    };
-  }
-
   @override
-  List<Object?> get props => [id, name, email, token];
+  List<Object?> get props => [token, id, username, email];
 }

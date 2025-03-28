@@ -1,40 +1,28 @@
-part of 'auth_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:mobile/features/auth/models/auth_model.dart';
 
-// Imports are moved to auth_bloc.dart
-
-@immutable
-sealed class AuthState extends Equatable {
+abstract class AuthState extends Equatable {
   const AuthState();
-
   @override
   List<Object?> get props => [];
 }
 
-// Kondisi awal, sebelum memeriksa status autentikasi
-final class AuthInitial extends AuthState {}
+class AuthInitial extends AuthState {}
 
-// Kondisi ketika operasi autentikasi sedang berlangsung
-final class AuthLoading extends AuthState {}
+class AuthLoading extends AuthState {}
 
-// Kondisi ketika pengguna berhasil diautentikasi
-final class AuthAuthenticated extends AuthState {
-  final AuthModel user;
-
-  const AuthAuthenticated({required this.user});
-
+class AuthAuthenticated extends AuthState {
+  final AuthModel? auth; // Opsional, bisa null kalau hanya cek token
+  const AuthAuthenticated({this.auth});
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [auth];
 }
 
-// Kondisi ketika pengguna tidak diautentikasi
-final class AuthUnauthenticated extends AuthState {}
+class AuthUnauthenticated extends AuthState {}
 
-// Kondisi ketika operasi autentikasi gagal
-final class AuthFailure extends AuthState {
+class AuthFailure extends AuthState {
   final String message;
-
-  const AuthFailure({required this.message});
-
+  const AuthFailure(this.message);
   @override
   List<Object?> get props => [message];
 }

@@ -4,31 +4,37 @@ import 'package:mobile/features/auth/bloc/auth_event.dart';
 import 'package:mobile/features/auth/bloc/auth_state.dart';
 import '../bloc/auth_bloc.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameOrEmailController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _fullNameController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameOrEmailController.dispose();
+    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
+    _fullNameController.dispose();
     super.dispose();
   }
 
-  void _login() {
+  void _register() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-            AuthLogin(
-              _usernameOrEmailController.text.trim(),
+            AuthRegister(
+              _usernameController.text.trim(),
+              _emailController.text.trim(),
               _passwordController.text.trim(),
+              _fullNameController.text.trim().isEmpty ? null : _fullNameController.text.trim(),
             ),
           );
     }
@@ -37,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Register')),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailure) {
@@ -56,12 +62,23 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFormField(
-                  controller: _usernameOrEmailController,
-                  decoration: const InputDecoration(labelText: 'Username or Email'),
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your username or email';
+                      return 'Please enter your username';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty || !value.contains('@')) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
@@ -78,21 +95,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _fullNameController,
+                  decoration: const InputDecoration(labelText: 'Full Name (Optional)'),
+                ),
                 const SizedBox(height: 32),
                 BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
                     return state is AuthLoading
                         ? const CircularProgressIndicator()
                         : ElevatedButton(
-                            onPressed: _login,
-                            child: const Text('Login'),
+                            onPressed: _register,
+                            child: const Text('Register'),
                           );
                   },
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/register'),
-                  child: const Text('Don\'t have an account? Register'),
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  child: const Text('Already have an account? Login'),
                 ),
               ],
             ),
