@@ -5,6 +5,7 @@ import 'package:mobile/features/order/bloc/order_state.dart';
 import 'package:mobile/features/order/service/order_service.dart';
 import '../bloc/order_bloc.dart';
 import '../../cart/model/cart_model.dart';
+import '../../payment/screens/payment_screen.dart';
 
 class OrderScreen extends StatelessWidget {
   final CartModel cart;
@@ -20,9 +21,9 @@ class OrderScreen extends StatelessWidget {
         body: BlocConsumer<OrderBloc, OrderState>(
           listener: (context, state) {
             if (state is OrderCreated) {
-              Navigator.pop(context); // Kembali ke CartScreen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Order created successfully')),
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => PaymentScreen(order: state.order)),
               );
             } else if (state is OrderError) {
               ScaffoldMessenger.of(context).showSnackBar(

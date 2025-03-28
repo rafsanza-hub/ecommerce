@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/features/auth/bloc/auth_state.dart';
+import 'package:mobile/features/auth/services/auth_service.dart';
 import 'package:mobile/features/cart/model/cart_model.dart';
+import 'package:mobile/features/order/model/order_model.dart';
 import 'features/auth/bloc/auth_bloc.dart';
-import 'features/auth/services/auth_service.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/home/screens/home_screen.dart';
@@ -18,6 +19,8 @@ import 'features/cart/bloc/cart_bloc.dart';
 import 'features/order/screens/order_screen.dart';
 import 'features/order/screens/order_history_screen.dart';
 import 'features/order/service/order_service.dart';
+import 'features/payment/screens/payment_screen.dart';
+import 'features/payment/service/payment_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +37,7 @@ void main() async {
   final categoryService = CategoryService();
   final cartService = CartService();
   final orderService = OrderService();
+  final paymentService = PaymentService();
 
   runApp(MyApp(
     authService: authService,
@@ -41,6 +45,7 @@ void main() async {
     categoryService: categoryService,
     cartService: cartService,
     orderService: orderService,
+    paymentService: paymentService,
   ));
 }
 
@@ -50,6 +55,7 @@ class MyApp extends StatelessWidget {
   final CategoryService categoryService;
   final CartService cartService;
   final OrderService orderService;
+  final PaymentService paymentService;
 
   const MyApp({
     super.key,
@@ -58,6 +64,7 @@ class MyApp extends StatelessWidget {
     required this.categoryService,
     required this.cartService,
     required this.orderService,
+    required this.paymentService,
   });
 
   @override
@@ -70,6 +77,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider.value(value: categoryService),
         RepositoryProvider.value(value: cartService),
         RepositoryProvider.value(value: orderService),
+        RepositoryProvider.value(value: paymentService),
       ],
       child: MaterialApp(
         title: 'E-commerce App',
@@ -89,8 +97,17 @@ class MyApp extends StatelessWidget {
           '/products': (_) => const ProductListScreen(),
           '/categories': (_) => const CategoryListScreen(),
           '/cart': (_) => const CartScreen(),
-          '/order': (_) => const OrderScreen(cart: CartModel(id: '', items: [], total: 0)), // Placeholder
+          '/order': (_) => const OrderScreen(
+              cart: CartModel(id: '', items: [], total: 0)), // Placeholder
           '/order_history': (_) => const OrderHistoryScreen(),
+          '/payment': (_) => PaymentScreen(
+              order: OrderModel(
+                  id: '',
+                  userId: '',
+                  items: [],
+                  total: 0,
+                  status: 'pending',
+                  createdAt: DateTime.now())), // Placeholder
         },
       ),
     );
