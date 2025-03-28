@@ -9,6 +9,11 @@ import 'features/auth/screens/register_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/product/screens/product_list_screen.dart';
 import 'features/product/service/product_service.dart';
+import 'features/category/screens/category_list_screen.dart';
+import 'features/category/service/category_service.dart';
+import 'features/cart/screens/cart_screen.dart';
+import 'features/cart/service/cart_service.dart';
+import 'features/cart/bloc/cart_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,24 +27,40 @@ void main() async {
 
   final authService = AuthService();
   final productService = ProductService();
+  final categoryService = CategoryService();
+  final cartService = CartService();
 
-  runApp(MyApp(authService: authService, productService: productService));
+  runApp(MyApp(
+    authService: authService,
+    productService: productService,
+    categoryService: categoryService,
+    cartService: cartService,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final AuthService authService;
   final ProductService productService;
+  final CategoryService categoryService;
+  final CartService cartService;
 
-  const MyApp(
-      {super.key, required this.authService, required this.productService});
+  const MyApp({
+    super.key,
+    required this.authService,
+    required this.productService,
+    required this.categoryService,
+    required this.cartService,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthBloc(authService: authService)),
-        RepositoryProvider.value(
-            value: productService), // Provide ProductService
+        BlocProvider(create: (_) => CartBloc(cartService: cartService)), // Global CartBloc
+        RepositoryProvider.value(value: productService),
+        RepositoryProvider.value(value: categoryService),
+        RepositoryProvider.value(value: cartService),
       ],
       child: MaterialApp(
         title: 'E-commerce App',
@@ -55,8 +76,10 @@ class MyApp extends StatelessWidget {
           '/': (_) => const AuthWrapper(),
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
-          '/home': (_) => HomeScreen(),
+          '/home': (_) => const HomeScreen(),
           '/products': (_) => const ProductListScreen(),
+          '/categories': (_) => const CategoryListScreen(),
+          '/cart': (_) => const CartScreen(),
         },
       ),
     );
@@ -78,7 +101,7 @@ class AuthWrapper extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthAuthenticated) {
-          return HomeScreen();
+          return const HomeScreen();
         } else if (state is AuthUnauthenticated || state is AuthFailure) {
           return const LoginScreen();
         }

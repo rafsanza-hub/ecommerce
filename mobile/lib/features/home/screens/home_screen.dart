@@ -17,6 +17,16 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/products'),
               child: const Text('Browse Products'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/categories'),
+              child: const Text('Browse Categories'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/cart'),
+              child: const Text('View Cart'),
+            ),
           ],
         ),
       ),

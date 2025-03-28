@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile/features/cart/bloc/cart_event.dart';
 import 'package:mobile/features/product/bloc/product_state.dart';
 import 'package:mobile/features/product/service/product_service.dart';
 import '../bloc/product_bloc.dart';
 import '../model/product_model.dart';
+import '../../cart/bloc/cart_bloc.dart';
 
 class ProductListScreen extends StatelessWidget {
-  const ProductListScreen({super.key});
+  final String? categoryId;
+
+  const ProductListScreen({super.key, this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,10 @@ class ProductListScreen extends StatelessWidget {
             if (state is ProductLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is ProductLoaded) {
-              return _buildProductList(state.products);
+              final products = categoryId != null
+                  ? state.products.where((p) => p.categoryId == categoryId).toList()
+                  : state.products;
+              return _buildProductList(context, products);
             } else {
               return const Center(child: Text('No products available'));
             }
@@ -36,7 +43,7 @@ class ProductListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductList(List<ProductModel> products) {
+  Widget _buildProductList(BuildContext context, List<ProductModel> products) {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemCount: products.length,
@@ -53,11 +60,22 @@ class ProductListScreen extends StatelessWidget {
             subtitle: Text(product.description.length > 50
                 ? '${product.description.substring(0, 50)}...'
                 : product.description),
-            trailing: Text('Rp ${product.price.toString()}'),
-            onTap: () {
-              // Opsional: Navigasi ke detail produk
-              // Navigator.pushNamed(context, '/product_detail', arguments: product.id);
-            },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Rp ${product.price.toString()}'),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.add_shopping_cart),
+                  onPressed: () {
+                    context.read<CartBloc>().add(AddToCart(product.id, 1));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${product.name} added to cart')),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
