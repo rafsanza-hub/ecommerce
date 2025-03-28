@@ -12,9 +12,9 @@ class OrderService {
 
   Future<List<OrderModel>> getOrders() async {
     final response = await HttpHelper.get('/orders');
-    return await HttpHelper.handleResponse(
+    return await HttpHelper.handleListResponse(
       response: response,
-      fromJson: (json) => (json as List).map((item) => OrderModel.fromJson(item)).toList(),
+      fromJson: (json) => json.map((item) => OrderModel.fromJson(item)).toList(),
     );
   }
 

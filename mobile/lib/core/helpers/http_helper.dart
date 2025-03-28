@@ -47,15 +47,12 @@ class HttpHelper {
     return await http.delete(url, headers: headers).timeout(Duration(seconds: 10));
   }
 
-  static Future<T> handleResponse<T>({
-    required http.Response response,
-    required T Function(Map<String, dynamic>) fromJson,
-  }) async {
+  static dynamic _processResponse(http.Response response) {
     final data = jsonDecode(response.body);
     switch (response.statusCode) {
       case 200:
       case 201:
-        return fromJson(data['data']); // Sesuai backend: {status, data, message}
+        return data['data']; 
       case 400:
         throw Exception(data['message'] ?? 'Bad request');
       case 401:
@@ -68,4 +65,23 @@ class HttpHelper {
         throw Exception('Unexpected error: ${response.statusCode}');
     }
   }
+
+  // Untuk object tunggal
+  static Future<T> handleResponse<T>({
+    required http.Response response,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
+    final data = _processResponse(response);
+    return fromJson(data as Map<String, dynamic>);
+  }
+
+  // Untuk list
+  static Future<T> handleListResponse<T>({
+    required http.Response response,
+    required T Function(List<dynamic>) fromJson,
+  }) async {
+    final data = _processResponse(response);
+    return fromJson(data as List<dynamic>);
+  }
+
 }

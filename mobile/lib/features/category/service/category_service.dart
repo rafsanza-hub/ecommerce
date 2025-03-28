@@ -4,9 +4,9 @@ import '../model/category_model.dart';
 class CategoryService {
   Future<List<CategoryModel>> getCategories() async {
     final response = await HttpHelper.get('/categories');
-    return await HttpHelper.handleResponse(
+    return await HttpHelper.handleListResponse(
       response: response,
-      fromJson: (json) => (json as List).map((item) => CategoryModel.fromJson(item)).toList(),
+      fromJson: (json) => json.map((item) => CategoryModel.fromJson(item)).toList(),
     );
   }
 

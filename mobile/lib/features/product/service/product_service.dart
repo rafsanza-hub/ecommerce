@@ -4,10 +4,14 @@ import '../model/product_model.dart';
 class ProductService {
   Future<List<ProductModel>> getProducts() async {
     final response = await HttpHelper.get('/products');
-    return await HttpHelper.handleResponse(
+    print(response.body);
+    final data = await HttpHelper.handleListResponse(
       response: response,
-      fromJson: (json) => (json as List).map((item) => ProductModel.fromJson(item)).toList(),
+      fromJson: (json) =>
+          json.map((item) => ProductModel.fromJson(item)).toList(),
     );
+    print(data);
+    return data;
   }
 
   Future<ProductModel> getProductById(String id) async {
