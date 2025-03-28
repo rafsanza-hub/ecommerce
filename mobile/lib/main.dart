@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/features/auth/bloc/auth_state.dart';
-import 'package:mobile/features/auth/services/auth_service.dart';
+import 'package:mobile/features/cart/model/cart_model.dart';
 import 'features/auth/bloc/auth_bloc.dart';
+import 'features/auth/services/auth_service.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/home/screens/home_screen.dart';
@@ -14,6 +15,9 @@ import 'features/category/service/category_service.dart';
 import 'features/cart/screens/cart_screen.dart';
 import 'features/cart/service/cart_service.dart';
 import 'features/cart/bloc/cart_bloc.dart';
+import 'features/order/screens/order_screen.dart';
+import 'features/order/screens/order_history_screen.dart';
+import 'features/order/service/order_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,12 +33,14 @@ void main() async {
   final productService = ProductService();
   final categoryService = CategoryService();
   final cartService = CartService();
+  final orderService = OrderService();
 
   runApp(MyApp(
     authService: authService,
     productService: productService,
     categoryService: categoryService,
     cartService: cartService,
+    orderService: orderService,
   ));
 }
 
@@ -43,6 +49,7 @@ class MyApp extends StatelessWidget {
   final ProductService productService;
   final CategoryService categoryService;
   final CartService cartService;
+  final OrderService orderService;
 
   const MyApp({
     super.key,
@@ -50,6 +57,7 @@ class MyApp extends StatelessWidget {
     required this.productService,
     required this.categoryService,
     required this.cartService,
+    required this.orderService,
   });
 
   @override
@@ -57,10 +65,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthBloc(authService: authService)),
-        BlocProvider(create: (_) => CartBloc(cartService: cartService)), // Global CartBloc
+        BlocProvider(create: (_) => CartBloc(cartService: cartService)),
         RepositoryProvider.value(value: productService),
         RepositoryProvider.value(value: categoryService),
         RepositoryProvider.value(value: cartService),
+        RepositoryProvider.value(value: orderService),
       ],
       child: MaterialApp(
         title: 'E-commerce App',
@@ -80,6 +89,8 @@ class MyApp extends StatelessWidget {
           '/products': (_) => const ProductListScreen(),
           '/categories': (_) => const CategoryListScreen(),
           '/cart': (_) => const CartScreen(),
+          '/order': (_) => const OrderScreen(cart: CartModel(id: '', items: [], total: 0)), // Placeholder
+          '/order_history': (_) => const OrderHistoryScreen(),
         },
       ),
     );

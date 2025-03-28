@@ -5,6 +5,7 @@ import 'package:mobile/features/cart/bloc/cart_state.dart';
 import 'package:mobile/features/cart/service/cart_service.dart';
 import '../bloc/cart_bloc.dart';
 import '../model/cart_model.dart';
+import '../../order/screens/order_screen.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -102,9 +103,9 @@ class CartScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: ElevatedButton(
             onPressed: () {
-              // Navigasi ke checkout (order) nanti
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Proceed to checkout (coming soon)')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => OrderScreen(cart: cart)),
               );
             },
             child: const Text('Checkout'),
