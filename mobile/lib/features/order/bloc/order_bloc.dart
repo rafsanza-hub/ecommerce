@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../service/order_service.dart';
 import 'order_event.dart';
 import 'order_state.dart';
+import 'package:flutter/foundation.dart';
 
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final OrderService orderService;
@@ -9,15 +10,15 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc({required this.orderService}) : super(OrderInitial()) {
     on<CreateOrder>(_onCreateOrder);
     on<FetchOrders>(_onFetchOrders);
-    on<FetchOrderById>(_onFetchOrderById);
   }
 
   Future<void> _onCreateOrder(CreateOrder event, Emitter<OrderState> emit) async {
     emit(OrderLoading());
     try {
-      final order = await orderService.createOrder();
+      final order = await orderService.createOrder(event.shippingAddress);
       emit(OrderCreated(order));
     } catch (e) {
+      if (kDebugMode) print('CreateOrder Error: $e');
       emit(OrderError(e.toString()));
     }
   }
@@ -28,16 +29,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       final orders = await orderService.getOrders();
       emit(OrdersLoaded(orders));
     } catch (e) {
-      emit(OrderError(e.toString()));
-    }
-  }
-
-  Future<void> _onFetchOrderById(FetchOrderById event, Emitter<OrderState> emit) async {
-    emit(OrderLoading());
-    try {
-      final order = await orderService.getOrderById(event.id);
-      emit(OrderDetailLoaded(order));
-    } catch (e) {
+      if (kDebugMode) print('FetchOrders Error: $e');
       emit(OrderError(e.toString()));
     }
   }

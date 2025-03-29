@@ -13,7 +13,7 @@ class CartService {
   }
 
   Future<CartModel> addToCart(String productId, int quantity) async {
-    final response = await HttpHelper.post('/cart', body: {
+    final response = await HttpHelper.post('/cart/item', body: {
       'productId': productId,
       'quantity': quantity,
     });

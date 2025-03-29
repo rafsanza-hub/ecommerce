@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../model/order_model.dart';
 
 abstract class OrderEvent extends Equatable {
   const OrderEvent();
@@ -6,13 +7,13 @@ abstract class OrderEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class CreateOrder extends OrderEvent {}
+class CreateOrder extends OrderEvent {
+  final ShippingAddress shippingAddress; // Tambah parameter ini
+
+  const CreateOrder(this.shippingAddress);
+
+  @override
+  List<Object?> get props => [shippingAddress];
+}
 
 class FetchOrders extends OrderEvent {}
-
-class FetchOrderById extends OrderEvent {
-  final String id;
-  const FetchOrderById(this.id);
-  @override
-  List<Object?> get props => [id];
-}

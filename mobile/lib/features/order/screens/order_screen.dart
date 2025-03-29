@@ -5,12 +5,32 @@ import 'package:mobile/features/order/bloc/order_state.dart';
 import 'package:mobile/features/order/service/order_service.dart';
 import '../bloc/order_bloc.dart';
 import '../../cart/model/cart_model.dart';
+import '../model/order_model.dart';
 import '../../payment/screens/payment_screen.dart';
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
   final CartModel cart;
 
   const OrderScreen({super.key, required this.cart});
+
+  @override
+  State<OrderScreen> createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  final _streetController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _countryController = TextEditingController(text: 'Indonesia');
+
+  @override
+  void dispose() {
+    _streetController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +55,7 @@ class OrderScreen extends StatelessWidget {
             if (state is OrderLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-            return _buildOrderSummary(context, cart);
+            return _buildOrderSummary(context, widget.cart);
           },
         ),
       ),
@@ -43,11 +63,16 @@ class OrderScreen extends StatelessWidget {
   }
 
   Widget _buildOrderSummary(BuildContext context, CartModel cart) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16.0),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Order Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: cart.items.length,
             itemBuilder: (context, index) {
               final item = cart.items[index];
@@ -58,25 +83,53 @@ class OrderScreen extends StatelessWidget {
               );
             },
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
+          const Divider(),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Text('Rp ${cart.total}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: ElevatedButton(
-            onPressed: () => context.read<OrderBloc>().add(CreateOrder()),
+          const SizedBox(height: 32),
+          const Text('Shipping Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _streetController,
+            decoration: const InputDecoration(labelText: 'Street', border: OutlineInputBorder()),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _cityController,
+            decoration: const InputDecoration(labelText: 'City', border: OutlineInputBorder()),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _postalCodeController,
+            decoration: const InputDecoration(labelText: 'Postal Code', border: OutlineInputBorder()),
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _countryController,
+            decoration: const InputDecoration(labelText: 'Country', border: OutlineInputBorder()),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              final shippingAddress = ShippingAddress(
+                street: _streetController.text.trim(),
+                city: _cityController.text.trim(),
+                postalCode: _postalCodeController.text.trim(),
+                country: _countryController.text.trim(),
+              );
+              context.read<OrderBloc>().add(CreateOrder(shippingAddress));
+            },
+            style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
             child: const Text('Place Order'),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

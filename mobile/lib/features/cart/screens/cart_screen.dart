@@ -110,6 +110,7 @@ class CartScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => OrderScreen(cart: cart)),
               );
             },
+            style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
             child: const Text('Checkout'),
           ),
         ),
