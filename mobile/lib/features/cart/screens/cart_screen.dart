@@ -20,7 +20,7 @@ class CartScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is CartError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                SnackBar(content: Text('Error: ${state.message}'), backgroundColor: Colors.red),
               );
             }
           },
@@ -29,6 +29,8 @@ class CartScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state is CartLoaded) {
               return _buildCartList(context, state.cart);
+            } else if (state is CartError) {
+              return Center(child: Text('Failed to load cart: ${state.message}'));
             } else {
               return const Center(child: Text('Your cart is empty'));
             }
@@ -60,14 +62,14 @@ class CartScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.remove),
                         onPressed: () => context.read<CartBloc>().add(
-                              UpdateCartItem(item.id, item.quantity - 1),
+                              UpdateCartItem(item.product.id, item.quantity - 1),
                             ),
                       ),
                       Text('${item.quantity}'),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () => context.read<CartBloc>().add(
-                              UpdateCartItem(item.id, item.quantity + 1),
+                              UpdateCartItem(item.product.id, item.quantity + 1),
                             ),
                       ),
                     ],
@@ -79,7 +81,7 @@ class CartScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => context.read<CartBloc>().add(
-                              RemoveFromCart(item.id),
+                              RemoveFromCart(item.product.id),
                             ),
                       ),
                     ],

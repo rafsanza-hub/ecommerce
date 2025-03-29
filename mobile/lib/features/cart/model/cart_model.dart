@@ -14,9 +14,11 @@ class CartModel extends Equatable {
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
     return CartModel(
-      id: json['id'] as String,
-      items: (json['items'] as List).map((item) => CartItem.fromJson(item)).toList(),
-      total: json['total'] as int,
+      id: json['id'] as String? ?? '',
+      items: (json['items'] as List<dynamic>? ?? [])
+          .map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      total: json['total'] as int? ?? 0,
     );
   }
 
@@ -25,24 +27,21 @@ class CartModel extends Equatable {
 }
 
 class CartItem extends Equatable {
-  final String id;
   final ProductModel product;
   final int quantity;
 
   const CartItem({
-    required this.id,
     required this.product,
     required this.quantity,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
-      id: json['id'] as String,
       product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
-      quantity: json['quantity'] as int,
+      quantity: json['quantity'] as int? ?? 0,
     );
   }
 
   @override
-  List<Object?> get props => [id, product, quantity];
+  List<Object?> get props => [product, quantity];
 }
