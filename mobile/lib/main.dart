@@ -21,6 +21,8 @@ import 'features/order/screens/order_history_screen.dart';
 import 'features/order/service/order_service.dart';
 import 'features/payment/screens/payment_screen.dart';
 import 'features/payment/service/payment_service.dart';
+import 'features/profile/screens/profile_screen.dart';
+import 'features/profile/service/profile_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,7 @@ void main() async {
   final cartService = CartService();
   final orderService = OrderService();
   final paymentService = PaymentService();
+  final profileService = ProfileService();
 
   runApp(MyApp(
     authService: authService,
@@ -46,6 +49,7 @@ void main() async {
     cartService: cartService,
     orderService: orderService,
     paymentService: paymentService,
+    profileService: profileService,
   ));
 }
 
@@ -56,6 +60,7 @@ class MyApp extends StatelessWidget {
   final CartService cartService;
   final OrderService orderService;
   final PaymentService paymentService;
+  final ProfileService profileService;
 
   const MyApp({
     super.key,
@@ -65,6 +70,7 @@ class MyApp extends StatelessWidget {
     required this.cartService,
     required this.orderService,
     required this.paymentService,
+    required this.profileService,
   });
 
   @override
@@ -78,6 +84,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider.value(value: cartService),
         RepositoryProvider.value(value: orderService),
         RepositoryProvider.value(value: paymentService),
+        RepositoryProvider.value(value: profileService),
       ],
       child: MaterialApp(
         title: 'E-commerce App',
@@ -97,8 +104,8 @@ class MyApp extends StatelessWidget {
           '/products': (_) => const ProductListScreen(),
           '/categories': (_) => const CategoryListScreen(),
           '/cart': (_) => const CartScreen(),
-          '/order': (_) => const OrderScreen(
-              cart: CartModel(id: '', items: [], total: 0)), // Placeholder
+          '/order': (_) =>
+              const OrderScreen(cart: CartModel(id: '', items: [], total: 0)),
           '/order_history': (_) => const OrderHistoryScreen(),
           '/payment': (_) => PaymentScreen(
               order: OrderModel(
@@ -107,7 +114,8 @@ class MyApp extends StatelessWidget {
                   items: [],
                   total: 0,
                   status: 'pending',
-                  createdAt: DateTime.now())), // Placeholder
+                  createdAt: DateTime.now())),
+          '/profile': (_) => const ProfileScreen(),
         },
       ),
     );

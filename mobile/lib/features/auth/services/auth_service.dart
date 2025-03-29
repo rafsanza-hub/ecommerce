@@ -13,6 +13,7 @@ class AuthService {
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
+    print('Get token: ${prefs.getString(_tokenKey)}');
     return prefs.getString(_tokenKey);
   }
 
