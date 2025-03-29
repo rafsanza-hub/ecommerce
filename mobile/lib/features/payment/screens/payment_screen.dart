@@ -5,6 +5,7 @@ import 'package:mobile/features/payment/bloc/payment_state.dart';
 import 'package:mobile/features/payment/service/payment_service.dart';
 import '../bloc/payment_bloc.dart';
 import '../../order/model/order_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatefulWidget {
   final OrderModel order;
@@ -16,7 +17,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  String _selectedMethod = 'cod'; // Default: Cash on Delivery
+  String _selectedPaymentType = 'credit_card';
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +28,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
         body: BlocConsumer<PaymentBloc, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
-              Navigator.pop(context); // Kembali ke OrderScreen
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payment processed successfully')),
+                const SnackBar(content: Text('Payment initiated. Redirecting...'), backgroundColor: Colors.green),
               );
+              if (state.payment.paymentUrl != null) {
+                _launchUrl(state.payment.paymentUrl!);
+              } else {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
             } else if (state is PaymentError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                SnackBar(content: Text('Error: ${state.message}'), backgroundColor: Colors.red),
               );
             }
           },
@@ -54,27 +59,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Order #${widget.order.id}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('Order ID: ${widget.order.id}'),
           const SizedBox(height: 16),
-          Text('Total: Rp ${widget.order.total}', style: const TextStyle(fontSize: 16)),
+          Text('Total: Rp ${widget.order.total}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 32),
-          const Text('Select Payment Method:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          RadioListTile<String>(
-            title: const Text('Cash on Delivery'),
-            value: 'cod',
-            groupValue: _selectedMethod,
-            onChanged: (value) => setState(() => _selectedMethod = value!),
+          const Text('Payment Type', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          DropdownButton<String>(
+            value: _selectedPaymentType,
+            onChanged: (value) {
+              setState(() {
+                _selectedPaymentType = value!;
+              });
+            },
+            items: const [
+              DropdownMenuItem(value: 'credit_card', child: Text('Credit Card')),
+              DropdownMenuItem(value: 'bank_transfer', child: Text('Bank Transfer')),
+              DropdownMenuItem(value: 'e_wallet', child: Text('E-Wallet')),
+            ],
           ),
-          RadioListTile<String>(
-            title: const Text('Bank Transfer'),
-            value: 'bank_transfer',
-            groupValue: _selectedMethod,
-            onChanged: (value) => setState(() => _selectedMethod = value!),
-          ),
-          const Spacer(),
+          const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () {
-              context.read<PaymentBloc>().add(ProcessPayment(widget.order.id, _selectedMethod));
+              context.read<PaymentBloc>().add(ProcessPayment(widget.order.id, _selectedPaymentType));
             },
             style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
             child: const Text('Process Payment'),
@@ -82,5 +88,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not launch $url'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error launching URL: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 }

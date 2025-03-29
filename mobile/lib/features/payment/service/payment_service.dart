@@ -1,20 +1,14 @@
 import 'package:mobile/core/helpers/http_helper.dart';
 import '../model/payment_model.dart';
+import 'package:flutter/foundation.dart';
 
 class PaymentService {
-  Future<PaymentModel> createPayment(String orderId, String method) async {
+  Future<PaymentModel> createPayment(String orderId, String paymentType) async { // Ubah dari paymentMethod
     final response = await HttpHelper.post('/payments', body: {
       'orderId': orderId,
-      'method': method,
+      'paymentType': paymentType, // Ubah dari paymentMethod
     });
-    return await HttpHelper.handleResponse(
-      response: response,
-      fromJson: PaymentModel.fromJson,
-    );
-  }
-
-  Future<PaymentModel> getPaymentById(String id) async {
-    final response = await HttpHelper.get('/payments/$id');
+    if (kDebugMode) print('CreatePayment Response: ${response.body}');
     return await HttpHelper.handleResponse(
       response: response,
       fromJson: PaymentModel.fromJson,

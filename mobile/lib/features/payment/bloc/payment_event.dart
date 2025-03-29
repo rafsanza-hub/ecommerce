@@ -8,15 +8,10 @@ abstract class PaymentEvent extends Equatable {
 
 class ProcessPayment extends PaymentEvent {
   final String orderId;
-  final String method;
-  const ProcessPayment(this.orderId, this.method);
-  @override
-  List<Object?> get props => [orderId, method];
-}
+  final String paymentType; // Ubah dari paymentMethod
 
-class FetchPayment extends PaymentEvent {
-  final String paymentId;
-  const FetchPayment(this.paymentId);
+  const ProcessPayment(this.orderId, this.paymentType);
+
   @override
-  List<Object?> get props => [paymentId];
+  List<Object?> get props => [orderId, paymentType];
 }
