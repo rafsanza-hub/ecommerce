@@ -1,106 +1,134 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:mobile/core/constants/colors.dart';
+import 'package:mobile/core/constants/sizes.dart';
+import 'package:mobile/features/auth/bloc/auth_bloc.dart';
 import 'package:mobile/features/auth/bloc/auth_event.dart';
-import 'package:mobile/features/profile/bloc/profile_event.dart';
-import 'package:mobile/features/profile/bloc/profile_state.dart';
-import 'package:mobile/features/profile/model/profile_model.dart';
-import 'package:mobile/features/profile/service/profile_service.dart';
-import '../bloc/profile_bloc.dart';
-import '../../auth/bloc/auth_bloc.dart';
+import 'package:mobile/features/profile/bloc/profile_bloc.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProfileBloc(profileService: context.read<ProfileService>()),
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
-        body: BlocConsumer<ProfileBloc, ProfileState>(
-          listener: (context, state) {
-            if (state is ProfileError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-              );
-            } else if (state is ProfileLoaded) {
-              _fullNameController.text = state.user.fullName ?? '';
-              _emailController.text = state.user.email;
-            }
-          },
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfileLoaded) {
-              return _buildProfileForm(context, state.user);
-            }
-            return const Center(child: Text('Failed to load profile'));
-          },
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(TSizes.defaultSpace),
+          child: Column(
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          NetworkImage('https://via.placeholder.com/150'),
+                    ),
+                    const SizedBox(height: TSizes.spaceBtwItems),
+                    Text(
+                      'User',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                      'rafsan@gmail.com',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Colors.grey),
+                    ),
+                    const SizedBox(height: TSizes.spaceBtwItems),
+                    SizedBox(
+                      width: 150,
+                      child: OutlinedButton(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/profile-detail'),
+                        child: const Text('Edit Profil'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: TSizes.spaceBtwSections),
+
+              // Settings
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Pengaturan',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: TSizes.spaceBtwItems),
+                  _buildLanguageTile(context),
+                  _buildDarkModeTile(context),
+                  _buildNotificationTile(context),
+                ],
+              ),
+              const SizedBox(height: TSizes.spaceBtwSections),
+
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => context.read<AuthBloc>().add(AuthLogout()),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.red),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileForm(BuildContext context, UserModel user) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  // Language selection tile
+  Widget _buildLanguageTile(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Iconsax.language_square),
+      title: const Text('Bahasa'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Username: ${user.username}', style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _fullNameController,
-            decoration: const InputDecoration(labelText: 'Full Name'),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () {
-              context.read<ProfileBloc>().add(
-                    UpdateProfile(
-                      fullName: _fullNameController.text.trim(),
-                      email: _emailController.text.trim(),
-                    ),
-                  );
-            },
-            style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-            child: const Text('Update Profile'),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(AuthLogout());
-              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-            },
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Logout'),
-          ),
+          Text('Indonesia', style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(width: TSizes.sm),
+          const Icon(Iconsax.arrow_right_3),
         ],
       ),
+      onTap: () {},
+    );
+  }
+
+  // Dark mode toggle tile
+  Widget _buildDarkModeTile(BuildContext context) {
+    // Menggunakan GetX untuk mendeteksi tema saat ini
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return ListTile(
+      leading: const Icon(Iconsax.moon),
+      title: const Text('Mode Gelap'),
+      trailing: Switch(
+        value: isDarkMode,
+        onChanged: (value) {},
+        activeColor: TColors.primary,
+      ),
+    );
+  }
+
+  // Notification settings tile
+  Widget _buildNotificationTile(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Iconsax.notification),
+      title: const Text('Notifikasi'),
+      trailing: const Icon(Iconsax.arrow_right_3),
+      onTap: () {},
     );
   }
 }

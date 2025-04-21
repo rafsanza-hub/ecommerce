@@ -6,6 +6,7 @@ import 'package:mobile/features/auth/bloc/auth_state.dart';
 import 'package:mobile/features/auth/services/auth_service.dart';
 import 'package:mobile/features/cart/model/cart_model.dart';
 import 'package:mobile/features/order/model/order_model.dart';
+import 'package:mobile/features/profile/screens/profile_screen.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
@@ -22,7 +23,7 @@ import 'features/order/screens/order_history_screen.dart';
 import 'features/order/service/order_service.dart';
 import 'features/payment/screens/payment_screen.dart';
 import 'features/payment/service/payment_service.dart';
-import 'features/profile/screens/profile_screen.dart';
+import 'features/profile/screens/profile_detail_screen.dart';
 import 'features/profile/service/profile_service.dart';
 
 void main() async {
@@ -97,7 +98,6 @@ class MyApp extends StatelessWidget {
           '/': (_) => const AuthWrapper(),
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
-          '/home': (_) => const HomeScreen(),
           '/products': (_) => const ProductListScreen(),
           '/categories': (_) => const CategoryListScreen(),
           '/cart': (_) => const CartScreen(),
@@ -113,6 +113,7 @@ class MyApp extends StatelessWidget {
                   status: 'pending',
                   createdAt: DateTime.now())),
           '/profile': (_) => const ProfileScreen(),
+          '/profile-detail': (_) => const ProfileDetailScreen(),
         },
       ),
     );
@@ -135,7 +136,7 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           print('pppppppppp');
-          return const HomeScreen();
+          return const BottomNavbar();
         } else if (state is AuthUnauthenticated || state is AuthFailure) {
           print('aaaaaaaaaaa');
           return const LoginScreen();
