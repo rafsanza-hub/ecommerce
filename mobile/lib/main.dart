@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile/core/theme/theme.dart';
 import 'package:mobile/features/auth/bloc/auth_state.dart';
 import 'package:mobile/features/auth/services/auth_service.dart';
 import 'package:mobile/features/cart/model/cart_model.dart';
@@ -89,12 +90,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'E-commerce App',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(elevation: 0, centerTitle: true),
-        ),
+        theme: TAppTheme.lightTheme,
+        darkTheme: TAppTheme.darkTheme,
         initialRoute: '/',
         routes: {
           '/': (_) => const AuthWrapper(),
@@ -137,8 +134,10 @@ class AuthWrapper extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthAuthenticated) {
+          print('pppppppppp');
           return const HomeScreen();
         } else if (state is AuthUnauthenticated || state is AuthFailure) {
+          print('aaaaaaaaaaa');
           return const LoginScreen();
         }
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
