@@ -19,7 +19,10 @@ class OrderService {
     if (kDebugMode) print('GetOrders Response: ${response.body}');
     return await HttpHelper.handleListResponse(
       response: response,
-      fromJson: (json) => json.map((item) => OrderModel.fromJson(item as Map<String, dynamic>)).toList(),
+      fromJson: (json) {
+        final data = (json as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
+        return data.map((item) => OrderModel.fromJson(item as Map<String, dynamic>)).toList();
+      },
     );
   }
 

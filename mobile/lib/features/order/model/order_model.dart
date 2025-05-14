@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:mobile/features/product/model/product_model.dart';
 import '../../cart/model/cart_model.dart';
-import '../../product/model/product_model.dart';
 
 class OrderModel extends Equatable {
   final String id;
@@ -8,9 +8,9 @@ class OrderModel extends Equatable {
   final List<CartItem> items;
   final int total;
   final String status;
-  final String? paymentStatus;
   final ShippingAddress? shippingAddress;
   final DateTime createdAt;
+  final Payment? payment;
 
   const OrderModel({
     required this.id,
@@ -18,46 +18,46 @@ class OrderModel extends Equatable {
     required this.items,
     required this.total,
     required this.status,
-    this.paymentStatus,
     this.shippingAddress,
     required this.createdAt,
+    this.payment,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    return OrderModel(
-      id: json['id'] as String? ?? '',
-      userId: json['user'] as String? ?? json['userId'] as String? ?? '',
-      items: (json['items'] as List<dynamic>? ?? []).map((item) {
-        final productJson = item['product'];
-        // Jika product adalah string (ID saja), buat ProductModel minimal
-        if (productJson is String) {
+  final userJson = json['user'] as Map<String, dynamic>?;
+  return OrderModel(
+    id: json['id'] as String? ?? '',
+    userId: userJson != null ? userJson['id'] as String? ?? '' : json['userId'] as String? ?? '',
+    items: (json['items'] as List<dynamic>? ?? [])
+        .map((item) {
+          final productJson = item['product'];
           return CartItem(
-            product: ProductModel(
-              id: productJson,
-              name: 'Unknown', // Default sementara
-              description: '',
-              price: item['price'] as int? ?? 0,
-              imageUrl: '',
-              categoryId: '',
-            ),
+            product: productJson is String
+                ? ProductModel(
+                    id: productJson,
+                    name: 'Unknown',
+                    description: '',
+                    price: item['price'] as int? ?? 0,
+                    imageUrl: '',
+                    categoryId: '',
+                  )
+                : ProductModel.fromJson(productJson as Map<String, dynamic>),
             quantity: item['quantity'] as int? ?? 0,
           );
-        }
-        // Jika product adalah object (tidak diharapkan di order), parse normal
-        return CartItem.fromJson(item as Map<String, dynamic>);
-      }).toList(),
-      total: json['total'] as int? ?? 0,
-      status: json['status'] as String? ?? 'pending',
-      paymentStatus: json['paymentStatus'] as String?,
-      shippingAddress: json['shippingAddress'] != null
-          ? ShippingAddress.fromJson(json['shippingAddress'] as Map<String, dynamic>)
-          : null,
-      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
-    );
-  }
+        })
+        .toList(),
+    total: json['total'] as int? ?? 0,
+    status: json['status'] as String? ?? 'pending',
+    shippingAddress: json['shippingAddress'] != null
+        ? ShippingAddress.fromJson(json['shippingAddress'] as Map<String, dynamic>)
+        : null,
+    createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+    payment: json['payment'] != null ? Payment.fromJson(json['payment'] as Map<String, dynamic>) : null,
+  );
+}
 
   @override
-  List<Object?> get props => [id, userId, items, total, status, paymentStatus, shippingAddress, createdAt];
+  List<Object?> get props => [id, userId, items, total, status, shippingAddress, createdAt, payment];
 }
 
 class ShippingAddress extends Equatable {
@@ -91,4 +91,33 @@ class ShippingAddress extends Equatable {
 
   @override
   List<Object?> get props => [street, city, postalCode, country];
+}
+
+class Payment extends Equatable {
+  final String id;
+  final String transactionId;
+  final String paymentType;
+  final int amount;
+  final String status;
+
+  const Payment({
+    required this.id,
+    required this.transactionId,
+    required this.paymentType,
+    required this.amount,
+    required this.status,
+  });
+
+  factory Payment.fromJson(Map<String, dynamic> json) {
+    return Payment(
+      id: json['id'] as String? ?? '',
+      transactionId: json['transactionId'] as String? ?? '',
+      paymentType: json['paymentType'] as String? ?? 'unknown',
+      amount: json['amount'] as int? ?? 0,
+      status: json['status'] as String? ?? 'pending',
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, transactionId, paymentType, amount, status];
 }
