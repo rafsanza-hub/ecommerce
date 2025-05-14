@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/cart/bindings/cart_binding.dart';
+import '../modules/cart/views/cart_view.dart';
 import '../modules/category/bindings/category_binding.dart';
 import '../modules/category/views/category_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.PRODUCT,
       page: () => const ProductView(),
       binding: ProductBinding(),
+    ),
+    GetPage(
+      name: _Paths.CART,
+      page: () => const CartView(),
+      binding: CartBinding(),
     ),
   ];
 }

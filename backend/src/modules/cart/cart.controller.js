@@ -72,7 +72,12 @@ class CartController {
       const responseData = {
         id: cart._id,
         items: cart.items.map(item => ({
-          product: item.product,
+          product:  {
+            id: item.product._id,
+            name: item.product.name,
+            price: item.product.price,
+            imageUrl: item.product.imageUrl
+          },
           quantity: item.quantity,
           price: item.price
         })),
