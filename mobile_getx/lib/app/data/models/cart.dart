@@ -27,7 +27,7 @@ class Cart extends Equatable {
 }
 
 class CartItem extends Equatable {
-  final Product product; // Kembalikan ke Product
+  final Product product; 
   final int quantity;
 
   const CartItem({

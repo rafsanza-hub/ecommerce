@@ -55,6 +55,11 @@ class HomeView extends GetView<HomeController> {
         ),
         ElevatedButton(
             onPressed: () {
+              Get.toNamed(Routes.ORDER);
+            },
+            child: Text('Order')),
+        ElevatedButton(
+            onPressed: () {
               Get.toNamed(Routes.CART);
             },
             child: Text('Cart')),

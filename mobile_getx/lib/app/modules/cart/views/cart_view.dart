@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:mobile_getx/app/data/models/order.dart';
+import 'package:mobile_getx/app/routes/app_pages.dart';
 
 import '../controllers/cart_controller.dart';
 
@@ -36,6 +38,23 @@ class CartView extends GetView<CartController> {
             child: Text('Total: \$${controller.itemCount}'),
           );
         }),
+        ElevatedButton(
+            onPressed: () {
+              controller.orderController.createOrder(ShippingAddress(
+                street: 'cisantana',
+                city: 'kuningan',
+                postalCode: '45552',
+                country: 'indonesia',
+              ));
+              Get.snackbar(
+                'Order Created',
+                'Your order has been created successfully',
+                snackPosition: SnackPosition.BOTTOM,
+                duration: Duration(seconds: 2),
+              );
+              Get.toNamed(Routes.ORDER);
+            },
+            child: Text('Checkout')),
       ]),
     );
   }

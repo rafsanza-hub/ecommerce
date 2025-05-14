@@ -1,6 +1,7 @@
 import 'package:mobile_getx/app/core/helpers/http_helper.dart';
 import 'package:mobile_getx/app/data/models/category.dart';
 import 'package:mobile_getx/app/data/models/cart.dart';
+import 'package:mobile_getx/app/data/models/order.dart';
 import 'package:mobile_getx/app/data/models/product.dart';
 
 class CategoryService {
@@ -82,6 +83,33 @@ class CategoryService {
     return await HttpHelper.handleResponse(
       response: response,
       fromJson: Cart.fromJson,
+    );
+  }
+
+  Future<void> createOrder(ShippingAddress shippingAddress) async {
+    final response = await HttpHelper.post('/orders', body: {
+      'shippingAddress': shippingAddress.toJson(),
+    });
+    response;
+  }
+
+  Future<List<Order>> getOrders() async {
+    final response = await HttpHelper.get('/orders');
+    return await HttpHelper.handleListResponse<List<Order>>(
+      response: response,
+      fromJson: (data) {
+        return data
+            .map((item) => Order.fromJson(item as Map<String, dynamic>))
+            .toList();
+      },
+    );
+  }
+
+  Future<Order> getOrderById(String id) async {
+    final response = await HttpHelper.get('/orders/$id');
+    return await HttpHelper.handleResponse(
+      response: response,
+      fromJson: Order.fromJson,
     );
   }
 }

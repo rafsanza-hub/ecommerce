@@ -1,9 +1,12 @@
 import 'package:get/get.dart';
 import 'package:mobile_getx/app/data/models/cart.dart';
 import 'package:mobile_getx/app/data/services/category_service.dart';
+import 'package:mobile_getx/app/modules/order/controllers/order_controller.dart';
 
 class CartController extends GetxController {
   final _cartService = CategoryService();
+  final OrderController orderController =
+      Get.put<OrderController>(OrderController());
 
   final cartItems = <CartItem>[].obs;
   final itemCount = 0.obs;
