@@ -12,15 +12,10 @@
 .swiftpm/
 migrate_working_dir/
 
-assets
-lib/app/core/helpers/helpers
+
 lib/app/modules/shopping
-pubspec.lock
-pubspec.yaml
-main copy.dart
-test_screen.dart
-loading_effect.dart
-images.dart
+assets
+
 
 # IntelliJ related
 *.iml
