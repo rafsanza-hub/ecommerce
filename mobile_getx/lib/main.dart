@@ -13,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:mobile_getx/app/modules/login/views/login_view.dart';
 import 'package:mobile_getx/app/modules/shopping/views/home_screen.dart';
+import 'package:mobile_getx/app/modules/splash/views/splash_view.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
-        home: LoginView(),
+        home: SplashView(),
         builder: (context, child) {
           return Directionality(
             textDirection: AppTheme.textDirection,
