@@ -27,6 +27,19 @@ class HomeView extends GetView<HomeController> {
             );
           }),
         ),
+        Expanded(
+          child: Obx(() {
+            return ListView.builder(
+              itemCount: controller.products.length,
+              itemBuilder: (context, index) {
+                final product = controller.products[index];
+                return ListTile(
+                  title: Text(product.name),
+                );
+              },
+            );
+          }),
+        ),
       ]),
     );
   }
