@@ -1,23 +1,9 @@
 import 'package:get/get.dart';
+import 'package:mobile_getx/app/modules/category/controllers/category_controller.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
+  final categories =
+      Get.put<CategoryController>(CategoryController()).categories;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
+  
 }
