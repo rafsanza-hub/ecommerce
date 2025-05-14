@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:mobile_getx/app/data/services/auth_services.dart';
+import 'package:mobile_getx/app/modules/register/views/register_view.dart';
 import 'package:mobile_getx/app/modules/shopping/views/register_screen.dart';
 
 class LoginController extends GetxController {
@@ -93,7 +94,7 @@ class LoginController extends GetxController {
   }
 
   void goToForgotPasswordScreen() {
-    Get.off(RegisterScreen());
+    Get.off(RegisterView());
   }
 
   Future<void> login() async {
@@ -115,7 +116,7 @@ class LoginController extends GetxController {
   }
 
   void goToRegisterScreen() {
-    Get.off(RegisterScreen());
+    Get.off(RegisterView());
   }
 
   Future<void> logout() async {

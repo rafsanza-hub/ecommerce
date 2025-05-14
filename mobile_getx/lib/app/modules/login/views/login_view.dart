@@ -48,7 +48,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                   20, MySpacing.safeAreaTop(context) + 64, 20, 20),
               children: [
                 MyText.displaySmall(
-                  'Hello Again!',
+                  'Hello aAgain!',
                   fontWeight: 700,
                   textAlign: TextAlign.center,
                 ),

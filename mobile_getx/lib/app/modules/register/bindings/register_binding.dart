@@ -1,12 +1,11 @@
 import 'package:get/get.dart';
-
-import '../controllers/register_controller.dart';
+import 'package:mobile_getx/app/modules/shopping/views/home_screen.dart';
 
 class RegisterBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<RegisterController>(
-      () => RegisterController(),
+    Get.lazyPut<HomeScreen>(
+      () => HomeScreen(),
     );
   }
 }

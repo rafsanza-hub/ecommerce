@@ -1,105 +1,280 @@
+import 'package:mobile_getx/app/core/theme/app_theme.dart';
+import 'package:mobile_getx/app/core/widgets/my_button.dart';
+import 'package:mobile_getx/app/core/widgets/my_container.dart';
+import 'package:mobile_getx/app/core/widgets/my_spacing.dart';
+import 'package:mobile_getx/app/core/widgets/my_text.dart';
+import 'package:mobile_getx/app/core/widgets/my_text_style.dart';
+import 'package:mobile_getx/app/modules/register/controllers/register_controller.dart';
+import 'package:mobile_getx/images.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-import '../controllers/register_controller.dart';
+class RegisterView extends StatefulWidget {
+  const RegisterView({Key? key}) : super(key: key);
 
-class RegisterView extends GetView<RegisterController> {
-  const RegisterView({super.key});
+  @override
+  _RegisterViewState createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<RegisterView>
+    with TickerProviderStateMixin {
+  late ThemeData theme;
+
+  late RegisterController controller;
+
+  late OutlineInputBorder outlineInputBorder;
+
+  @override
+  void initState() {
+    super.initState();
+    theme = AppTheme.shoppingTheme;
+
+    controller = RegisterController(this);
+
+    outlineInputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(4)),
+      borderSide: BorderSide(
+        color: Colors.transparent,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    return GetBuilder<RegisterController>(
+        init: controller,
+        tag: 'register_controller',
+        builder: (controller) {
+          return _buildBody();
+        });
+  }
+
+  Widget _buildBody() {
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(children: [
+      body: ListView(
+        padding:
+            MySpacing.fromLTRB(20, MySpacing.safeAreaTop(context) + 48, 20, 20),
+        children: [
+          MyText.displaySmall(
+            'Registeer',
+            fontWeight: 700,
+            textAlign: TextAlign.center,
+          ),
+          MySpacing.height(20),
+          MyText.bodyMedium(
+            'Sign up to get started!',
+            muted: true,
+            textAlign: TextAlign.center,
+          ),
+          MySpacing.height(32),
           Form(
             key: controller.formKey,
-            child: Column(children: [
-              TextFormField(
-                controller: controller.usernameC,
-                decoration: InputDecoration(labelText: 'Username'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a username';
-                  }
-                  if (value.length < 3) {
-                    return 'Username must be at least 3 characters';
-                  }
-                  return null;
-                },
+            child: Column(
+              children: [
+                SlideTransition(
+                  position: controller.nameAnimation,
+                  child: TextFormField(
+                    style: MyTextStyle.bodyMedium(),
+                    decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        filled: true,
+                        isDense: true,
+                        fillColor: theme.cardTheme.color,
+                        prefixIcon: Icon(
+                          LucideIcons.user,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                        hintText: "Name",
+                        enabledBorder: outlineInputBorder,
+                        focusedBorder: outlineInputBorder,
+                        border: outlineInputBorder,
+                        contentPadding: MySpacing.all(16),
+                        hintStyle: MyTextStyle.bodyMedium(),
+                        isCollapsed: true),
+                    maxLines: 1,
+                    controller: controller.fullNameTE,
+                    validator: controller.validateName,
+                    cursorColor: theme.colorScheme.onBackground,
+                  ),
+                ),
+                MySpacing.height(20),
+                SlideTransition(
+                  position: controller.emailAnimation,
+                  child: TextFormField(
+                    style: MyTextStyle.bodyMedium(),
+                    decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        filled: true,
+                        isDense: true,
+                        fillColor: theme.cardTheme.color,
+                        prefixIcon: Icon(
+                          LucideIcons.mail,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                        hintText: "Email Address",
+                        enabledBorder: outlineInputBorder,
+                        focusedBorder: outlineInputBorder,
+                        border: outlineInputBorder,
+                        contentPadding: MySpacing.all(16),
+                        hintStyle: MyTextStyle.bodyMedium(),
+                        isCollapsed: true),
+                    maxLines: 1,
+                    controller: controller.emailTE,
+                    validator: controller.validateEmail,
+                    cursorColor: theme.colorScheme.onBackground,
+                  ),
+                ),
+                MySpacing.height(20),
+                SlideTransition(
+                  position: controller.emailAnimation,
+                  child: TextFormField(
+                    style: MyTextStyle.bodyMedium(),
+                    decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        filled: true,
+                        isDense: true,
+                        fillColor: theme.cardTheme.color,
+                        prefixIcon: Icon(
+                          LucideIcons.mail,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                        hintText: "Phone Number",
+                        enabledBorder: outlineInputBorder,
+                        focusedBorder: outlineInputBorder,
+                        border: outlineInputBorder,
+                        contentPadding: MySpacing.all(16),
+                        hintStyle: MyTextStyle.bodyMedium(),
+                        isCollapsed: true),
+                    maxLines: 1,
+                    controller: controller.phoneTE,
+                    validator: controller.validatePhone,
+                    cursorColor: theme.colorScheme.onBackground,
+                  ),
+                ),
+                MySpacing.height(20),
+                SlideTransition(
+                  position: controller.passwordAnimation,
+                  child: TextFormField(
+                    style: MyTextStyle.bodyMedium(),
+                    decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        filled: true,
+                        isDense: true,
+                        fillColor: theme.cardTheme.color,
+                        prefixIcon: Icon(
+                          LucideIcons.lock,
+                          color: theme.colorScheme.onBackground,
+                        ),
+                        hintText: "Password",
+                        enabledBorder: outlineInputBorder,
+                        focusedBorder: outlineInputBorder,
+                        border: outlineInputBorder,
+                        contentPadding: MySpacing.all(16),
+                        hintStyle: MyTextStyle.bodyMedium(),
+                        isCollapsed: true),
+                    maxLines: 1,
+                    controller: controller.passwordTE,
+                    validator: controller.validatePassword,
+                    cursorColor: theme.colorScheme.onBackground,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          MySpacing.height(20),
+          MyButton.block(
+            elevation: 0,
+            borderRadiusAll: 4,
+            onPressed: () {
+              controller.register();
+            },
+            padding: MySpacing.y(20),
+            splashColor: theme.colorScheme.onPrimary.withAlpha(30),
+            backgroundColor: theme.colorScheme.primary,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MyText.labelLarge(
+                  "Create Account",
+                  fontWeight: 600,
+                  color: theme.colorScheme.onPrimary,
+                  letterSpacing: 0.4,
+                ),
+                MySpacing.width(8),
+                SlideTransition(
+                  position: controller.arrowAnimation,
+                  child: Icon(
+                    LucideIcons.arrowRight,
+                    color: theme.colorScheme.onPrimary,
+                    size: 20,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          MySpacing.height(20),
+          Row(
+            children: [
+              Expanded(child: Divider()),
+              Padding(
+                padding: MySpacing.x(20),
+                child: MyText.bodySmall(
+                  'Continue with',
+                  muted: true,
+                  fontWeight: 600,
+                  fontSize: 10,
+                ),
               ),
-              TextFormField(
-                controller: controller.emailC,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an email';
-                  }
-                  if (!GetUtils.isEmail(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
+              Expanded(child: Divider()),
+            ],
+          ),
+          MySpacing.height(24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              MyContainer.bordered(
+                padding: MySpacing.all(16),
+                borderRadiusAll: 8,
+                child: Image(
+                  height: 24,
+                  width: 24,
+                  image: AssetImage(Images.google),
+                ),
               ),
-              TextFormField(
-                controller: controller.fullNameC,
-                decoration: InputDecoration(labelText: 'Full Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your full name';
-                  }
-                  if (value.length < 3) {
-                    return 'Full name must be at least 3 characters';
-                  }
-                  return null;
-                },
+              MyContainer.bordered(
+                padding: MySpacing.all(16),
+                borderRadiusAll: 8,
+                child: Image(
+                  height: 24,
+                  width: 24,
+                  image: AssetImage(Images.apple),
+                ),
               ),
-              TextFormField(
-                controller: controller.phoneC,
-                decoration: InputDecoration(labelText: 'Phone Number'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a phone number';
-                  }
-
-                  return null;
-                },
+              MyContainer.bordered(
+                padding: MySpacing.all(16),
+                borderRadiusAll: 8,
+                child: Image(
+                  height: 24,
+                  width: 24,
+                  image: AssetImage(Images.facebook),
+                ),
               ),
-              TextFormField(
-                controller: controller.passwordC,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: controller.confirmPasswordC,
-                decoration: InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value != controller.passwordC.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    if (!controller.formKey.currentState!.validate()) return;
-
-                    controller.register();
-                  },
-                  child: Text('Register')),
-            ]),
-          )
-        ]),
+            ],
+          ),
+          MySpacing.height(20),
+          Center(
+            child: MyButton.text(
+              onPressed: () {
+                controller.goToLogInScreen();
+              },
+              splashColor: theme.colorScheme.primary.withAlpha(40),
+              child: MyText.labelLarge("I have an Account",
+                  decoration: TextDecoration.underline,
+                  color: theme.colorScheme.primary),
+            ),
+          ),
+        ],
       ),
     );
   }
