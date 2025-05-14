@@ -112,4 +112,15 @@ class CategoryService {
       fromJson: Order.fromJson,
     );
   }
+
+  Future<Payment> createPayment(String orderId, String paymentType) async {
+    final response = await HttpHelper.post('/payments', body: {
+      'orderId': orderId,
+      'paymentType': paymentType,
+    });
+    return await HttpHelper.handleResponse(
+      response: response,
+      fromJson: Payment.fromJson,
+    );
+  }
 }

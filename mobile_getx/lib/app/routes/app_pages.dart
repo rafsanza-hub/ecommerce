@@ -10,6 +10,8 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/order/bindings/order_binding.dart';
 import '../modules/order/views/order_view.dart';
+import '../modules/payment/bindings/payment_binding.dart';
+import '../modules/payment/views/payment_view.dart';
 import '../modules/product/bindings/product_binding.dart';
 import '../modules/product/views/product_view.dart';
 import '../modules/register/bindings/register_binding.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.ORDER,
       page: () => const OrderView(),
       binding: OrderBinding(),
+    ),
+    GetPage(
+      name: _Paths.PAYMENT,
+      page: () => const PaymentView(),
+      binding: PaymentBinding(),
     ),
   ];
 }
