@@ -6,6 +6,7 @@ import 'package:mobile_getx/app/data/models/category.dart';
 import 'package:mobile_getx/app/data/models/product.dart';
 import 'package:mobile_getx/app/modules/cart/controllers/cart_controller.dart';
 import 'package:mobile_getx/app/modules/category/controllers/category_controller.dart';
+import 'package:mobile_getx/app/modules/detail_product/views/detail_product_view.dart';
 import 'package:mobile_getx/app/modules/home/views/home_view.dart';
 import 'package:mobile_getx/app/modules/product/controllers/product_controller.dart';
 import 'package:mobile_getx/app/modules/shopping/shopping_constants.dart';
@@ -80,7 +81,6 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialization moved to constructor to ensure all fields are ready
   }
 
   @override
@@ -118,7 +118,7 @@ class HomeController extends GetxController {
   }
 
   void goToSingleProduct(Product product) {
-    Get.to(() => HomeView(), duration: const Duration(milliseconds: 500));
+    Get.to(DetailProductView(product), duration: Duration(milliseconds: 500));
   }
 
   void goToSubscription() {
