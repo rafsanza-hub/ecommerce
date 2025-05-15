@@ -10,6 +10,7 @@ class ProductController extends GetxController {
   Future<void> getProducts() async {
     try {
       products.value = await apiService.getProducts();
+      print('Products: ${products.length}');
     } catch (e) {
       print('Error fetching products: $e');
 

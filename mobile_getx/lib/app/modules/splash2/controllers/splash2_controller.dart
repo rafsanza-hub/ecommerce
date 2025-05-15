@@ -19,15 +19,6 @@ class Splash2Controller extends GetxController {
     ShoppingCache.carts = await Cart.getDummyList();
     await Future.delayed(Duration(seconds: 1));
 
-    Get.off(MainView()
-        // PageRouteBuilder(
-        //     transitionDuration: Duration(seconds: 2),
-        //     pageBuilder: (_, __, ___) => FullApp()),
-        );
-    // Navigator.of(context, rootNavigator: true).pushReplacement(
-    //   PageRouteBuilder(
-    //       transitionDuration: Duration(seconds: 2),
-    //       pageBuilder: (_, __, ___) => FullApp()),
-    // );
+    Get.off(MainView());
   }
 }

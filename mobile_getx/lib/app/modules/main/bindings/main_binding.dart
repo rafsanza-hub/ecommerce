@@ -1,12 +1,11 @@
 import 'package:get/get.dart';
-
-import '../controllers/main_controller.dart';
+import 'package:mobile_getx/app/modules/splash2/controllers/splash2_controller.dart';
 
 class MainBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<MainController>(
-      () => MainController(),
+    Get.lazyPut<Splash2Controller>(
+      () => Splash2Controller(),
     );
   }
 }

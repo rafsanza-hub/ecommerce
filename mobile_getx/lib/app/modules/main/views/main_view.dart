@@ -1,7 +1,7 @@
+import 'package:mobile_getx/app/modules/home/views/home_view.dart';
 import 'package:mobile_getx/app/modules/main/controllers/main_controller.dart';
 import 'package:mobile_getx/app/modules/shopping/controllers/full_app_controller.dart';
 import 'package:mobile_getx/app/modules/shopping/views/cart_screen.dart';
-import 'package:mobile_getx/app/modules/shopping/views/home_screen.dart';
 import 'package:mobile_getx/app/modules/shopping/views/profile_screen.dart';
 import 'package:mobile_getx/app/modules/shopping/views/search_screen.dart';
 import 'package:mobile_getx/app/core/theme/app_theme.dart';
@@ -60,7 +60,7 @@ class _MainViewState extends State<MainView>
                   child: TabBarView(
                     controller: controller.tabController,
                     children: const <Widget>[
-                      HomeScreen(),
+                      HomeView(),
                       SearchScreen(),
                       CartScreen(),
                       ProfileScreen(),
